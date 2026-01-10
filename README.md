@@ -16,6 +16,7 @@ El objetivo de Edbian 1.0 es la creación de una adaptación de Debian 13 que cu
 - Balena Etcher incluido como paquete instalado, ya que el appImage oficial no funciona en Debian 13.
 - Aplicación adicional de instalación de paquetes
 - Tienda de aplicaciones visual como Discover
+- Gestor visual de usuarios 
 
 ## MVP 
 Se considera el MVP a una versión que contiene lo anteriormente mencionado, aunque está aun lejos de su versión final
@@ -33,3 +34,11 @@ El proyecto cumple con un doble objetivo:
 - [ ] Fondo de escritorio personoalizado
 - [ ] Usuario incluido en grupo sudoers
 - [ ] Paquetes .deb personalizados instalados
+- [ ] Falta gestor de usuarios visual
+- [ ] Falta incluir repositorios como KXStudio
+
+
+## Error durante la ejecución del script
+Setting up balena-etcher (2.1.4) ...
+chmod: cannot access '/opt/balenaEtcher/chrome-sandbox': No such file or directory
+
