@@ -18,4 +18,11 @@ El proyecto cumple con un doble objetivo:
 - Creación de un respin de debian más cómodo de usar para el usuario final
 - Ejecución del proyecto basado en el mindset Agile, creciendo dicho sistema en función de las necesidades de los usuarios
 
-
+## BUGS conocidos
+- [x] Kernel RT instalado
+- [x] Teclado e idioma en castellano
+- [x] Plank arranca al inicio
+- [x] Picom arranca al inicio
+- [ ] Fondo de escritorio personoalizado
+- [ ] Usuario incluido en grupo sudoers
+- [ ] Paquetes .deb personalizados instalados
