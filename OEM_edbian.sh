@@ -120,14 +120,30 @@ autologin-session=xfce
 EOF
 
 # ==================================================
+# HOOK PARA IDIOMA EN LIVE
+# ==================================================
+mkdir -p config/hooks/live
+
+cat > config/hooks/live/01-locales-es.hook.chroot << 'EOF'
+#!/bin/sh
+set -e
+
+echo "es_ES.UTF-8 UTF-8" > /etc/locale.gen
+locale-gen
+update-locale LANG=es_ES.UTF-8 LANGUAGE=es_ES:es
+EOF
+
+chmod +x config/hooks/live/01-locales-es.hook.chroot
+
+# ==================================================
 # XFCE OEM (SKEL)
 # ==================================================
 echo "🎨 Copiando configuración XFCE OEM..."
 
 mkdir -p config/includes.chroot/etc/skel/.config
 
-cp -a "$USER_HOME/.config/xfce4" \
-      config/includes.chroot/etc/skel/.config/
+#cp -a "$USER_HOME/.config/xfce4" \
+#      config/includes.chroot/etc/skel/.config/
 
 [ -d "$USER_HOME/.config/plank" ] && \
   cp -a "$USER_HOME/.config/plank" \
@@ -136,6 +152,24 @@ cp -a "$USER_HOME/.config/xfce4" \
 [ -f "$USER_HOME/.config/picom.conf" ] && \
   cp "$USER_HOME/.config/picom.conf" \
      config/includes.chroot/etc/skel/.config/
+     
+mkdir -p config/includes.chroot/etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml
+
+cat > config/includes.chroot/etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<channel name="xfce4-desktop" version="1.0">
+  <property name="backdrop">
+    <property name="screen0">
+      <property name="monitor0">
+        <property name="workspace0">
+          <property name="last-image" type="string" value="/usr/share/backgrounds/edbian.jpg"/>
+          <property name="image-style" type="int" value="5"/>
+        </property>
+      </property>
+    </property>
+  </property>
+</channel>
+EOF
 
 # ==================================================
 # FONDO DE PANTALLA OEM
@@ -164,18 +198,73 @@ cp "$CUSTOM_DEBS"/*.deb \
 # ==================================================
 # HOOK OEM → INSTALA LOS .DEB EN EL SISTEMA MAESTRO
 # ==================================================
-mkdir -p config/hooks/live
+#mkdir -p config/hooks/live
 
-cat > config/hooks/live/99-install-oem-debs.hook.chroot << 'EOF'
+#cat > config/hooks/live/99-install-oem-debs.hook.chroot << 'EOF'
+#!/bin/sh
+#set -e
+
+#echo "Instalando paquetes OEM..."
+#dpkg -i /opt/edbian-debs/*.deb || true
+#apt-get -f install -y
+#EOF
+
+#chmod +x config/hooks/live/99-install-oem-debs.hook.chroot
+
+mkdir -p config/hooks/normal
+
+cat > config/hooks/normal/99-install-oem-debs.hook.chroot << 'EOF'
 #!/bin/sh
 set -e
 
-echo "Instalando paquetes OEM..."
-dpkg -i /opt/edbian-debs/*.deb || true
-apt-get -f install -y
+DEB_DIR="/opt/edbian-debs"
+
+if [ -d "$DEB_DIR" ] && ls "$DEB_DIR"/*.deb >/dev/null 2>&1; then
+  echo "Instalando paquetes OEM..."
+  dpkg -i "$DEB_DIR"/*.deb || true
+  apt-get -f install -y
+else
+  echo "No hay paquetes OEM para instalar"
+fi
 EOF
 
-chmod +x config/hooks/live/99-install-oem-debs.hook.chroot
+chmod +x config/hooks/normal/99-install-oem-debs.hook.chroot
+
+# ==================================================
+# AUTOSTART PLANK Y PICOM
+# ==================================================
+mkdir -p config/includes.chroot/etc/skel/.config/autostart
+
+cat > config/includes.chroot/etc/skel/.config/autostart/plank.desktop << EOF
+[Desktop Entry]
+Type=Application
+Name=Plank
+Exec=plank
+OnlyShowIn=XFCE;
+X-GNOME-Autostart-enabled=true
+EOF
+
+cat > config/includes.chroot/etc/skel/.config/autostart/picom.desktop << EOF
+[Desktop Entry]
+Type=Application
+Name=Picom
+Exec=picom --config /home/*/.config/picom.conf
+OnlyShowIn=XFCE;
+X-GNOME-Autostart-enabled=true
+EOF
+
+
+# ==================================================
+# AÑADIR USUARIO A GRUPO SUDOERS
+# ==================================================
+mkdir -p config/includes.chroot/etc/sudoers.d
+
+cat > config/includes.chroot/etc/sudoers.d/90-oem-sudo << EOF
+%sudo ALL=(ALL:ALL) ALL
+EOF
+
+chmod 440 config/includes.chroot/etc/sudoers.d/90-oem-sudo
+
 
 # ==================================================
 # PRESEED OEM (MINIMAL, INTERACTIVO)
@@ -209,7 +298,10 @@ set default=0
 set timeout=5
 
 menuentry "Live edbian 13 XFCE OEM" {
-  linux /live/vmlinuz boot=live quiet splash
+  linux /live/vmlinuz boot=live \
+    locales=es_ES.UTF-8 \
+    keyboard-layouts=es \
+    quiet splash
   initrd /live/initrd.img
 }
 
@@ -226,4 +318,3 @@ echo "🚀 Construyendo ISO OEM..."
 sudo lb build
 
 
-#Comentario para ver que funciona GIT
