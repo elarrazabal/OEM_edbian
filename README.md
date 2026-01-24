@@ -31,11 +31,12 @@ El proyecto cumple con un doble objetivo:
 - [x] Teclado e idioma en castellano
 - [x] Plank arranca al inicio
 - [x] Picom arranca al inicio
+- [x] Usuario incluido en grupo sudoers
+- [x] Paquetes .deb personalizados instalados
+- [x] Falta incluir repositorios como KXStudio
 - [ ] Fondo de escritorio personoalizado
-- [ ] Usuario incluido en grupo sudoers
-- [ ] Paquetes .deb personalizados instalados
 - [ ] Falta gestor de usuarios visual
-- [ ] Falta incluir repositorios como KXStudio
+
 
 
 ## Error durante la ejecución del script

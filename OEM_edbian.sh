@@ -136,40 +136,77 @@ EOF
 chmod +x config/hooks/live/01-locales-es.hook.chroot
 
 # ==================================================
+# BLOQUEAR PANEL XFCE POR DEFECTO (CRÍTICO)
+# ==================================================
+cat > config/hooks/live/20-disable-xfce-default-panel.hook.chroot << 'EOF'
+#!/bin/sh
+set -e
+mkdir -p /etc/xdg/xfce4/panel
+touch /etc/xdg/xfce4/panel/disable-defaults
+EOF
+chmod +x config/hooks/live/20-disable-xfce-default-panel.hook.chroot
+
+
+# ==================================================
+# XFCE PANEL + WHISKER (OEM)
+# ==================================================
+mkdir -p config/includes.chroot/etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml
+
+cat > config/includes.chroot/etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<channel name="xfce4-panel" version="1.0">
+  <property name="panels">
+    <value type="int" value="1"/>
+  </property>
+  <property name="panels/panel-1">
+    <property name="position" type="string" value="p=6;x=0;y=0"/>
+    <property name="length" type="uint" value="100"/>
+    <property name="plugin-ids">
+      <value type="int" value="1"/>
+    </property>
+  </property>
+  <property name="plugins/plugin-1" type="empty">
+    <property name="type" type="string" value="whiskermenu"/>
+  </property>
+</channel>
+EOF
+
+
+# ==================================================
 # XFCE OEM (SKEL)
 # ==================================================
-echo "🎨 Copiando configuración XFCE OEM..."
+#echo "🎨 Copiando configuración XFCE OEM..."
 
-mkdir -p config/includes.chroot/etc/skel/.config
+#mkdir -p config/includes.chroot/etc/skel/.config
 
 #cp -a "$USER_HOME/.config/xfce4" \
 #      config/includes.chroot/etc/skel/.config/
 
-[ -d "$USER_HOME/.config/plank" ] && \
-  cp -a "$USER_HOME/.config/plank" \
-        config/includes.chroot/etc/skel/.config/
+#[ -d "$USER_HOME/.config/plank" ] && \
+#  cp -a "$USER_HOME/.config/plank" \
+#        config/includes.chroot/etc/skel/.config/
 
-[ -f "$USER_HOME/.config/picom.conf" ] && \
-  cp "$USER_HOME/.config/picom.conf" \
-     config/includes.chroot/etc/skel/.config/
+#[ -f "$USER_HOME/.config/picom.conf" ] && \
+#  cp "$USER_HOME/.config/picom.conf" \
+#     config/includes.chroot/etc/skel/.config/
      
-mkdir -p config/includes.chroot/etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml
+#mkdir -p config/includes.chroot/etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml
 
-cat > config/includes.chroot/etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml << EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<channel name="xfce4-desktop" version="1.0">
-  <property name="backdrop">
-    <property name="screen0">
-      <property name="monitor0">
-        <property name="workspace0">
-          <property name="last-image" type="string" value="/usr/share/backgrounds/edbian.jpg"/>
-          <property name="image-style" type="int" value="5"/>
-        </property>
-      </property>
-    </property>
-  </property>
-</channel>
-EOF
+#cat > config/includes.chroot/etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml << EOF
+#<?xml version="1.0" encoding="UTF-8"?>
+#<channel name="xfce4-desktop" version="1.0">
+#  <property name="backdrop">
+#    <property name="screen0">
+#      <property name="monitor0">
+#        <property name="workspace0">
+#          <property name="last-image" type="string" value="/usr/share/backgrounds/edbian.jpg"/>
+#          <property name="image-style" type="int" value="5"/>
+#        </property>
+#      </property>
+#    </property>
+#  </property>
+#</channel>
+#EOF
 
 # ==================================================
 # FONDO DE PANTALLA OEM
@@ -185,6 +222,7 @@ cp assets/edbian.jpg \
 
 cp assets/edbian.jpg \
    config/includes.binary/edbian.jpg
+
 
 # ==================================================
 # PAQUETES .DEB OEM
